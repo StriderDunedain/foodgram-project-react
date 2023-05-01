@@ -1,21 +1,23 @@
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404
+
 from reportlab.pdfbase import pdfmetrics
 from reportlab.pdfbase.ttfonts import TTFont
 from reportlab.pdfgen import canvas
+
 from rest_framework import status, viewsets
 from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.viewsets import ReadOnlyModelViewSet
 
-from api.filters import AuthorAndTagFilter, IngredientSearchFilter
-from api.models import (Cart, Favorite, Ingredient, IngredientAmount, Recipe,
-                        Tag)
-from api.pagination import LimitPageNumberPagination
-from api.permissions import IsAdminOrReadOnly, IsOwnerOrReadOnly
-from api.serializers import (CropRecipeSerializer, IngredientSerializer,
-                             RecipeSerializer, TagSerializer)
+from .filters import AuthorAndTagFilter, IngredientSearchFilter
+from .models import (Cart, Favorite, Ingredient, IngredientAmount, Recipe,
+                     Tag)
+from .pagination import LimitPageNumberPagination
+from .permissions import IsAdminOrReadOnly, IsOwnerOrReadOnly
+from .serializers import (CropRecipeSerializer, IngredientSerializer,
+                          RecipeSerializer, TagSerializer)
 
 
 class TagsViewSet(ReadOnlyModelViewSet):
@@ -47,7 +49,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
     def favorite(self, request, pk=None):
         if request.method == 'GET':
             return self.add_obj(Favorite, request.user, pk)
-        elif request.method == 'DELETE':
+        if request.method == 'DELETE':
             return self.delete_obj(Favorite, request.user, pk)
         return None
 
@@ -56,7 +58,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
     def shopping_cart(self, request, pk=None):
         if request.method == 'GET':
             return self.add_obj(Cart, request.user, pk)
-        elif request.method == 'DELETE':
+        if request.method == 'DELETE':
             return self.delete_obj(Cart, request.user, pk)
         return None
 
