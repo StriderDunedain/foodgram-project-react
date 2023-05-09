@@ -60,13 +60,12 @@ jobs:
           host: ${{ secrets.HOST }}
           username: ${{ secrets.USER }}
           key: ${{ secrets.SSH_KEY }}
-          passphrase: ${{ secrets.PASSPHRASE }}
           script: |
+            sudo docker pull ${{ secrets.DOCKER_USERNAME }}/foodgram_frontend:latest
             sudo docker pull ${{ secrets.DOCKER_USERNAME }}/foodgram-project:latest
             sudo docker compose stop
-            sudo docker compose rm nginx
+            sudo docker compose rm backend
             rm .env
-
             touch .env
             echo DB_ENGINE=${{ secrets.DB_ENGINE }} >> .env
             echo DB_NAME=${{ secrets.DB_NAME }} >> .env
