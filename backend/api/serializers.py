@@ -1,10 +1,7 @@
 from django.shortcuts import get_object_or_404
-
 from drf_extra_fields.fields import Base64ImageField
-
 from rest_framework import serializers
 from rest_framework.validators import UniqueTogetherValidator
-
 from users.models import Follow
 from users.serializers import CustomUserSerializer
 
@@ -74,8 +71,8 @@ class RecipeSerializer(serializers.ModelSerializer):
     def validate(self, data):
         ingredients = self.initial_data.get('ingredients')
         if not ingredients:
-            raise serializers.ValidationError({
-                'ingredients': 'Нужен хоть один ингридиент для рецепта'})
+            raise serializers.ValidationError(
+                'Нужен хоть один ингридиент для рецепта')
         ingredient_list = []
         for ingredient_item in ingredients:
             ingredient = get_object_or_404(Ingredient,
@@ -93,12 +90,12 @@ class RecipeSerializer(serializers.ModelSerializer):
         return data
 
     def create_ingredients(self, ingredients, recipe):
-        for ingredient in ingredients:
-            IngredientAmount.objects.create(
+        IngredientAmount.objects.bulk_create(
+            IngredientAmount(
                 recipe=recipe,
                 ingredient_id=ingredient.get('id'),
                 amount=ingredient.get('amount'),
-            )
+            ) for ingredient in ingredients)
 
     def create(self, validated_data):
         image = validated_data.pop('image')
@@ -158,6 +155,8 @@ class FollowSerializer(serializers.ModelSerializer):
         request = self.context.get('request')
         limit = request.GET.get('recipes_limit')
         queryset = Recipe.objects.filter(author=obj.author)
+        # author = request.get('author')
+        # queryset = Recipes.author
         if limit:
             queryset = queryset[:int(limit)]
         return CropRecipeSerializer(queryset, many=True).data
