@@ -1,3 +1,5 @@
+# Это я написал просто потому что мне надоело все это вручную вводить
+
 docker compose down -v
 
 docker image rm $(docker image ls -q maxthecoder/foodgram-backend:latest)
