@@ -1,36 +1,38 @@
-import json
+import csv
 import os
 
-from django.conf import settings
-from django.core.management.base import BaseCommand, CommandError
-from django.db.utils import IntegrityError
+from django.core.management.base import BaseCommand
 
-from ...models import Ingredient
+from backend import settings
 
-DATA_ROOT = os.path.join(settings.BASE_DIR, 'data')
+from progress.bar import IncrementalBar
+
+from api.models import Ingredient
 
 
 class Command(BaseCommand):
-    help = 'loading ingredients from data in json'
-
-    def add_arguments(self, parser):
-        parser.add_argument('filename', default='ingredients.json', nargs='?',
-                            type=str)
+    help = "Load ingredients to DB"
 
     def handle(self, *args, **options):
         try:
-            with open(os.path.join(DATA_ROOT, options['filename']), 'r',
-                      encoding='utf-8') as f:
-                data = json.load(f)
-                for ingredient in data:
-                    try:
-                        Ingredient.objects.create(name=ingredient["name"],
-                                                  measurement_unit=ingredient[
-                                                      "measurement_unit"])
-                    except IntegrityError:
-                        print(f'Ингридиет {ingredient["name"]} '
-                              f'{ingredient["measurement_unit"]} '
-                              f'уже есть в базе')
-
-        except FileNotFoundError:
-            raise CommandError('Файл отсутствует в директории data')
+            path = os.path.join(settings.BASE_DIR, './data/ingredients.csv')
+            with open(path, 'r', encoding='utf-8') as file:
+                row_count = sum(1 for row in file)
+            with open(path, 'r', encoding='utf-8') as file:
+                reader = csv.reader(file)
+                bar = IncrementalBar(
+                    'ingredients.csv'.ljust(17), max=row_count
+                )
+                next(reader)
+                for row in reader:
+                    bar.next()
+                    Ingredient.objects.get_or_create(
+                        name=row[0],
+                        measurement_unit=row[1]
+                    )
+                bar.finish()
+            self.stdout.write(
+                "[!] The ingredients has been loaded successfully."
+            )
+        except Exception as e:
+            print('Error while compiling:', e)

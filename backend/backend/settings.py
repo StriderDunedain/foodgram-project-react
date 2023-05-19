@@ -11,7 +11,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SECRET_KEY = os.getenv('SECRET_KEY', default='wdj!v*=#*amk4d2!k&nizs6phtwp0eqf3ysmq7j&)xxpwpf2w*')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True
 
 ALLOWED_HOSTS = ['*']
 
@@ -19,8 +19,6 @@ ALLOWED_HOSTS = ['*']
 # Application definition
 
 INSTALLED_APPS = [
-    'api',
-    'users',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -32,6 +30,8 @@ INSTALLED_APPS = [
     'djoser',
     'corsheaders',
     'django_filters',
+    'api',
+    'users',
 ]
 
 MIDDLEWARE = [
@@ -46,7 +46,7 @@ MIDDLEWARE = [
     'django.middleware.common.CommonMiddleware',
 ]
 
-# ROOT_URLCONF = 'backend.urls'
+ROOT_URLCONF = 'backend.urls'
 
 TEMPLATES = [
     {
@@ -68,7 +68,7 @@ WSGI_APPLICATION = 'backend.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': os.environ.get('DB_ENGINE', default='django.db.backends.postgresql'),
+        'ENGINE': 'django.db.backends.postgresql',
         'NAME': os.environ.get('DB_NAME', default='postgres'),
         'USER': os.environ.get('POSTGRES_USER', default='postgres'),
         'PASSWORD': os.environ.get('POSTGRES_PASSWORD', default='dracula'),
@@ -110,7 +110,7 @@ MEDIA_ROOT = os.path.join(BASE_DIR, "media")
 
 CORS_URLS_REGEX = r'*'
 CORS_ALLOWED_ORIGINS = [
-    'http://localhost/',
+    'http://localhost',
 ]
 
 DEFAULT_AUTO_FIELD = 'django.db.models.AutoField'

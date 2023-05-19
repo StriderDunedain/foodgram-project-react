@@ -1,0 +1,23 @@
+docker compose down -v
+
+docker image rm $(docker image ls -q maxthecoder/foodgram-backend:latest)
+
+docker build -t maxthecoder/foodgram-backend:latest ../backend
+
+docker push maxthecoder/foodgram-backend:latest
+
+docker compose up -d
+
+docker compose exec backend python manage.py makemigrations
+
+docker compose exec backend python manage.py migrate
+
+docker compose exec backend python manage.py collectstatic --no-input
+
+import_status=$(docker compose exec backend python manage.py import_csv)
+
+cd ../../to_teleg
+
+source venv/Scripts/activate
+
+python send_to_teleg.py $(echo $import_status)
