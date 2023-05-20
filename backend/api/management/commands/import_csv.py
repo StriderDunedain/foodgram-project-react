@@ -3,11 +3,11 @@ import os
 
 from api.models import Ingredient
 
+from backend import settings
+
 from django.core.management.base import BaseCommand
 
 from progress.bar import IncrementalBar
-
-from backend import settings
 # Знаю, что не в том порядке, но только так проходит тесты
 
 
