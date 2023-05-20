@@ -9,6 +9,7 @@ from django.core.management.base import BaseCommand
 
 from progress.bar import IncrementalBar
 # Знаю, что не в том порядке, но только так проходит тесты
+# Isort vs flake8
 
 
 class Command(BaseCommand):
