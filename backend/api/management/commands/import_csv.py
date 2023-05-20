@@ -32,7 +32,7 @@ class Command(BaseCommand):
                     )
                 bar.finish()
             self.stdout.write(
-                "[!] The ingredients has been loaded successfully."
+                "The ingredients have been loaded successfully!"
             )
         except Exception as e:
             print('Error while compiling:', e)
