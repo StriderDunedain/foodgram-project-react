@@ -1,4 +1,5 @@
 import csv
+
 import os
 
 # Знаю, что не в том порябке, но flake8 и isort дают
