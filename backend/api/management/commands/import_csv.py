@@ -1,13 +1,16 @@
 import csv
 import os
 
-from django.core.management.base import BaseCommand
+# Знаю, что не в том порябке, но flake8 и isort дают
+# разные результаты
+
+from api.models import Ingredient
 
 from backend import settings
 
-from progress.bar import IncrementalBar
+from django.core.management.base import BaseCommand
 
-from api.models import Ingredient
+from progress.bar import IncrementalBar
 
 
 class Command(BaseCommand):
