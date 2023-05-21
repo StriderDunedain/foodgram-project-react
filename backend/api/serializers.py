@@ -1,7 +1,5 @@
 from django.shortcuts import get_object_or_404
-
 from drf_extra_fields.fields import Base64ImageField
-
 from rest_framework import serializers
 from rest_framework.validators import UniqueTogetherValidator
 
@@ -75,16 +73,13 @@ class RecipeSerializer(serializers.ModelSerializer):
         ingredients = self.initial_data.get('ingredients')
         if not ingredients:
             raise serializers.ValidationError(
-                'Нужен хоть один ингридиент для рецепта')
-        ingredient_list = []
-        for ingredient_item in ingredients:
-            ingredient = get_object_or_404(Ingredient,
-                                           id=ingredient_item['id'])
-            if ingredient in ingredient_list:
-                raise serializers.ValidationError('Ингридиенты должны '
-                                                  'быть уникальными')
-            ingredient_list.append(ingredient)
-            if int(ingredient_item['amount']) < 0:
+                'Нужен хоть один ингредиент для рецепта')
+        ingredient_set = set()
+        for ingredient in ingredients:
+            current_ingredient = get_object_or_404(Ingredient,
+                                                   id=ingredient['id'])
+            ingredient_set.add(current_ingredient)
+            if int(ingredient['amount']) < 0:
                 raise serializers.ValidationError({
                     'ingredients': ('Убедитесь, что значение количества '
                                     'ингредиента больше 0')
@@ -142,7 +137,7 @@ class FollowSerializer(serializers.ModelSerializer):
     last_name = serializers.ReadOnlyField(source='author.last_name')
     is_subscribed = serializers.SerializerMethodField()
     recipes = serializers.SerializerMethodField()
-    recipes_count = serializers.SerializerMethodField()
+    recipes_count = serializers.ReadOnlyField(source='author.')
 
     class Meta:
         model = Follow

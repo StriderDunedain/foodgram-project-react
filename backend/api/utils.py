@@ -1,5 +1,4 @@
 from django.http import HttpResponse
-
 from reportlab.pdfbase import pdfmetrics
 from reportlab.pdfbase.ttfonts import TTFont
 from reportlab.pdfgen import canvas
