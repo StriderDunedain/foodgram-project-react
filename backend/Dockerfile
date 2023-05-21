@@ -1,11 +1,15 @@
-FROM python:3.8.5
+FROM python:3.9
 
-WORKDIR /code
+WORKDIR /app
 
 COPY requirements.txt .
 
-RUN pip3 install -r requirements.txt
+RUN apt update && \
+    apt upgrade -y && \
+    apt -y install gcc && \
+    python3 -m pip install --upgrade pip && \
+    pip3 install -r requirements.txt --no-cache-dir
 
-COPY . .
+COPY . ./
 
-CMD ["gunicorn", "backend.wsgi:application", "--bind", "0:8000" ]
+CMD ["gunicorn", "foodgram.wsgi:application", "--bind", "0:8000"]
