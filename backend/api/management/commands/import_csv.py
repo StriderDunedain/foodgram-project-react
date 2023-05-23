@@ -1,11 +1,11 @@
 import csv
 import os
 
+from backend import settings
 from django.core.management.base import BaseCommand
 from progress.bar import IncrementalBar
 
 from api.models import Ingredient
-from backend import settings
 
 
 class Command(BaseCommand):
@@ -30,7 +30,7 @@ class Command(BaseCommand):
                     )
                 bar.finish()
             self.stdout.write(
-                "[!] The ingredients has been loaded successfully."
+                "The ingredients have been loaded successfully!"
             )
         except Exception as e:
-            print('Error while compiling:', e)
+            print('Error while adding ingredients to db:', e)

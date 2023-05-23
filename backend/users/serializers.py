@@ -1,8 +1,9 @@
 from django.contrib.auth import get_user_model
-
+from django.shortcuts import get_object_or_404
 from djoser.serializers import UserCreateSerializer, UserSerializer
-
 from rest_framework import serializers
+from rest_framework import status
+from rest_framework.response import Response
 from rest_framework.validators import UniqueValidator
 
 from .models import Follow
@@ -40,6 +41,26 @@ class CustomUserSerializer(UserSerializer):
 
     def get_is_subscribed(self, obj):
         user = self.context.get('request').user
+        author = get_object_or_404(User, id=obj.id)
+
         if user.is_anonymous:
             return False
+
+        if self.method == 'GET':
+            if user == author:
+                return Response({
+                    'errors': 'Вы не можете подписываться на самого себя'
+                }, status=status.HTTP_400_BAD_REQUEST)
+
+        if self.method == 'DELETE':
+            if user == author:
+                return Response({
+                    'errors': 'Вы не можете отписываться от самого себя'
+                }, status=status.HTTP_400_BAD_REQUEST)
+
+        if not self.method == 'DELETE':
+            if Follow.objects.filter(user=user, author=author).exists():
+                return Response({
+                    'errors': 'Вы уже подписаны на данного пользователя'
+                }, status=status.HTTP_400_BAD_REQUEST)
         return Follow.objects.filter(user=user, author=obj.id).exists()
