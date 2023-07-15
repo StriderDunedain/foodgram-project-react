@@ -1,16 +1,17 @@
+from django.contrib.auth.models import AbstractUser
 from django.db.models import (
+    CASCADE,
+    CharField,
+    CheckConstraint,
+    DateTimeField,
+    EmailField,
+    F,
     ForeignKey,
     Model,
-    EmailField,
-    CharField,
-    CASCADE,
-    DateTimeField,
     Q,
-    F,
-    UniqueConstraint,
-    CheckConstraint
+    UniqueConstraint
 )
-from django.contrib.auth.models import AbstractUser
+
 from core import constants as const
 
 
