@@ -1,18 +1,9 @@
 from django.contrib.auth import get_user_model
 from django.core.validators import MaxValueValidator, MinValueValidator
-from django.db.models import (
-    CASCADE,
-    SET_NULL,
-    CharField,
-    DateTimeField,
-    ForeignKey,
-    ImageField,
-    ManyToManyField,
-    Model,
-    PositiveSmallIntegerField,
-    TextField,
-    UniqueConstraint
-)
+from django.db.models import (CASCADE, SET_NULL, CharField, DateTimeField,
+                              ForeignKey, ImageField, ManyToManyField, Model,
+                              PositiveSmallIntegerField, TextField,
+                              UniqueConstraint)
 
 from core import constants as const
 
@@ -50,7 +41,7 @@ class Tag(Model):
 class Ingredient(Model):
     name = CharField(
         verbose_name='Название ингредиента',
-        max_length=55
+        max_length=150
     )
     measurement_unit = CharField(
         verbose_name='Единицы измерения',
@@ -209,7 +200,7 @@ class Favorite(Model):
         return f'{self.user} -> {self.recipe}'
 
 
-class Favorite(Model):
+class Cart(Model):
     recipe = ForeignKey(
         verbose_name='Рецепт в корзине',
         related_name='in_cart',

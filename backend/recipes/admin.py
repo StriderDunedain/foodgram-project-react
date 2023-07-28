@@ -1,19 +1,19 @@
-from django.contrib.admin import ModelAdmin
-from django.contrib.admin import register
-from recipes.models import Recipe, Ingredient
+from django.contrib.admin import ModelAdmin, display, register
+
+from recipes.models import Ingredient, Recipe
 
 
 @register(Recipe)
 class RecipeAdmin(ModelAdmin):
-    list_display = ('name', 'author')
+    list_display = ('name', 'author', 'count_favorites')
     list_filter = (
         'author',
         'name',
-        'tags',
-        'count_favorites'
+        'tags'
     )
 
-    def count_recipes(self, obj):
+    @display(description='В избранном')
+    def count_favorites(self, obj):
         return obj.in_favorites.count()
 
 
