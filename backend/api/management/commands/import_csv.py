@@ -1,15 +1,17 @@
 import csv
 import os
 
-from backend import settings
 from django.core.management.base import BaseCommand
+
+from foodgram import settings
+
 from progress.bar import IncrementalBar
 
-from api.models import Ingredient
+from recipes.models import Ingredient
 
 
 class Command(BaseCommand):
-    help = "Load ingredients to DB"
+    help = 'Load ingredients to DB'
 
     def handle(self, *args, **options):
         try:
@@ -30,7 +32,7 @@ class Command(BaseCommand):
                     )
                 bar.finish()
             self.stdout.write(
-                "The ingredients have been loaded successfully!"
+                'The ingredients have been loaded successfully!'
             )
         except Exception as e:
             print('Error while adding ingredients to db:', e)
