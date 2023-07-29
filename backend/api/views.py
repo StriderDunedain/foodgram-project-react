@@ -1,30 +1,23 @@
-from api.mixins import AddDelViewMixin
-from api.pagination import LimitPageNumberPagination
-from rest_framework.permissions import DjangoModelPermissions
-from rest_framework.permissions import IsAuthenticated
-from api.permissions import (
-    AdminOrReadOnly,
-    AuthorStaffOrReadOnly
-)
-from api.serializers import (
-    IngredientSerializer,
-    RecipeSerializer,
-    ShortRecipeSerializer,
-    TagSerializer,
-    UserSubscribeSerializer
-)
-from core.enums import Tuples, UrlQueries
-from core.services import create_shoping_list
 from django.contrib.auth import get_user_model
 from django.db.models import Q
 from django.http.response import HttpResponse
 from djoser.views import UserViewSet as DjoserUserViewSet
-from recipes.models import Cart, Favorite, Ingredient, Recipe, Tag
 from rest_framework.decorators import action
+from rest_framework.permissions import DjangoModelPermissions, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.routers import APIRootView
 from rest_framework.status import HTTP_400_BAD_REQUEST
 from rest_framework.viewsets import ModelViewSet, ReadOnlyModelViewSet
+
+from api.mixins import AddDelViewMixin
+from api.pagination import LimitPageNumberPagination
+from api.permissions import AdminOrReadOnly, AuthorStaffOrReadOnly
+from api.serializers import (IngredientSerializer, RecipeSerializer,
+                             ShortRecipeSerializer, TagSerializer,
+                             UserSubscribeSerializer)
+from core.enums import Tuples, UrlQueries
+from core.services import create_shoping_list
+from recipes.models import Cart, Favorite, Ingredient, Recipe, Tag
 from users.models import Subscription
 
 User = get_user_model()
@@ -113,9 +106,9 @@ class RecipeViewSet(ModelViewSet, AddDelViewMixin):
 
         is_in_cart = self.request.query_params.get(UrlQueries.SHOP_CART)
         if is_in_cart in Tuples.SYMBOL_TRUE_SEARCH.value:
-            queryset = queryset.filter(in_Cart__user=self.request.user)
+            queryset = queryset.filter(in_сart__user=self.request.user)
         elif is_in_cart in Tuples.SYMBOL_FALSE_SEARCH.value:
-            queryset = queryset.exclude(in_Cart__user=self.request.user)
+            queryset = queryset.exclude(in_сart__user=self.request.user)
 
         is_favorite = self.request.query_params.get(UrlQueries.FAVORITE)
         if is_favorite in Tuples.SYMBOL_TRUE_SEARCH.value:
