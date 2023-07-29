@@ -3,8 +3,7 @@ from django.utils.html import format_html
 from django.utils.safestring import mark_safe
 
 from recipes.forms import TagForm
-from recipes.models import (Cart, Favorite, Ingredient, IngredientAmount,
-                            Recipe, Tag)
+from recipes.models import (Cart, Favorite, IngredientAmount, Tag)
 from users.models import Subscription
 
 
@@ -18,7 +17,6 @@ class LinksAdmin(ModelAdmin):
     pass
 
 
-@register(Ingredient)
 class IngredientAdmin(ModelAdmin):
     list_display = ('name', 'measurement_unit')
     search_fields = ('name',)
@@ -27,7 +25,6 @@ class IngredientAdmin(ModelAdmin):
     save_on_top = True
 
 
-@register(Recipe)
 class RecipeAdmin(ModelAdmin):
     list_display = (
         'name',
@@ -68,7 +65,7 @@ class TagAdmin(ModelAdmin):
 
 @register(Favorite)
 class FavoriteAdmin(ModelAdmin):
-    list_display = ('user', 'recipe', 'date_added')
+    list_display = ('user', 'recipe', 'adding_date')
     search_fields = ('user__username', 'recipe__name')
 
     def has_change_permission(self):
@@ -80,7 +77,7 @@ class FavoriteAdmin(ModelAdmin):
 
 @register(Cart)
 class CartAdmin(ModelAdmin):
-    list_display = ('user', 'recipe', 'date_added')
+    list_display = ('user', 'recipe', 'adding_date')
     search_fields = ('user__username', 'recipe__name')
 
     def has_change_permission(self):
@@ -93,8 +90,8 @@ class CartAdmin(ModelAdmin):
 @register(Subscription)
 class SubscriptionAdmin(ModelAdmin):
     list_display = (
-        'author__username',
-        'subscriber__username',
+        'author',
+        'subscriber',
         'creation_date'
     )
     list_filter = ('author__username', 'author__email')
