@@ -1,13 +1,9 @@
-from django.forms import ModelForm
-from django.forms.widgets import TextInput
+from django.forms import Form
 
 from recipes.models import Tag
 
 
-class TagForm(ModelForm):
+class TagForm(Form):
     class Meta:
         model = Tag
-        fields = '__all__'
-        widgets = {
-            'color': TextInput(attrs={'type': 'color'}),
-        }
+        fields = ('name', 'color', 'slug')

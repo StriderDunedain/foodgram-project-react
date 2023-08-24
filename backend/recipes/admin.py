@@ -1,23 +1,38 @@
-from django.contrib.admin import ModelAdmin, display, register
+from django.contrib.admin import ModelAdmin, register
 
-from recipes.models import Ingredient, Recipe
+from .models import Cart, Favorite, Ingredient, Recipe, Tag, RecipeIngredient
+
+
+@register(Tag)
+class TagAdmin(ModelAdmin):
+    list_display = ('name', 'color', 'slug')
 
 
 @register(Recipe)
 class RecipeAdmin(ModelAdmin):
-    list_display = ('name', 'author', 'count_favorites')
-    list_filter = (
-        'author',
-        'name',
-        'tags'
-    )
+    list_display = ('name', 'author', 'in_favorites')
+    search_filter = ('author', 'name', 'tags')
 
-    @display(description='В избранном')
-    def count_favorites(self, obj):
-        return obj.in_favorites.count()
+    def in_favorites(self, recipe):
+        return recipe.fav_recipe.count()
 
 
 @register(Ingredient)
 class IngredientAdmin(ModelAdmin):
     list_display = ('name', 'measurement_unit')
-    list_filter = ('name',)
+    search_fields = ('name',)
+
+
+@register(Cart)
+class CartAdmin(ModelAdmin):
+    list_display = ('user', 'recipe')
+
+
+@register(Favorite)
+class FavoriteAdmin(ModelAdmin):
+    list_display = ('user', 'recipe')
+
+
+@register(RecipeIngredient)
+class RecipeIngredientAdmin(ModelAdmin):
+    list_display = ('recipe', 'ingredients')
