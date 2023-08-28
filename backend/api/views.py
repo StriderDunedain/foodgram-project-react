@@ -1,45 +1,38 @@
 from django.db.models import Sum
+from django.http import HttpResponse
 from django.shortcuts import get_object_or_404
 from rest_framework.mixins import Response
+from rest_framework.permissions import IsAuthenticated, IsAuthenticatedOrReadOnly
 from rest_framework.viewsets import ModelViewSet, ReadOnlyModelViewSet
 from rest_framework.decorators import action
-from rest_framework.status import HTTP_200_OK, HTTP_201_CREATED, HTTP_204_NO_CONTENT
+from rest_framework.status import HTTP_201_CREATED, HTTP_204_NO_CONTENT
+from django_filters.rest_framework import DjangoFilterBackend
 
 from recipes.models import Ingredient, Recipe, Tag, Favorite, Cart, RecipeIngredient
 from users.models import User, Subscription
 
-from .pagination import RecipePagination
+from .pagination import RecipeUserPagination
 from .serializers import (IngredientSerializer, TagSerializer,
                           UserCreateSerializer, UserSerializer,
                           RecipeSerializer, SubscriptionSerializer,
                           RecipeDetailSerializer)
 
 
-def common_post_method(model, kwargs, request):
-    obj = get_object_or_404(model, pk=kwargs['pk'])
-    user = request.user
-    if model == Subscription:
-        Subscription.objects.create(author=obj, subscriber=user)
-        serializer = SubscriptionSerializer(obj)
-        return Response(serializer.data, status=HTTP_201_CREATED)
-
-    Favorite.objects.create(user=user, recipe=obj)
-    serializer = RecipeDetailSerializer(obj)
-    return Response(serializer.data, status=HTTP_201_CREATED)
-
-
-
 class UserModelViewSet(ModelViewSet):
     queryset = User.objects.all()
     serializer_class = UserSerializer
-    pagination_class = RecipePagination
+    pagination_class = RecipeUserPagination
 
     def get_serializer_class(self):
         if self.request.method == 'POST':
             return UserCreateSerializer
         return super().get_serializer_class()
 
-    @action(detail=False, methods=['GET'])
+    @action(
+        detail=False,
+        methods=['GET'],
+        permission_classes=(IsAuthenticated,)
+    )
     def subscriptions(self, request):
         user = request.user
         authors = User.objects.filter(subscriptions__subscriber=user)
@@ -51,7 +44,11 @@ class UserModelViewSet(ModelViewSet):
         )
         return self.get_paginated_response(serializer.data)
 
-    @action(detail=True, methods=['POST'])
+    @action(
+        detail=True,
+        methods=['POST'],
+        permission_classes=(IsAuthenticated,)
+    )
     def subscribe(self, *args, **kwargs):
         author = get_object_or_404(User, pk=kwargs['pk'])
         user = self.request.user
@@ -70,19 +67,38 @@ class UserModelViewSet(ModelViewSet):
 class TagModelViewSet(ReadOnlyModelViewSet):
     queryset = Tag.objects.all()
     serializer_class = TagSerializer
+    permission_classes = (IsAuthenticatedOrReadOnly,)
 
 
 class IngredientModelViewSet(ReadOnlyModelViewSet):
     queryset = Ingredient.objects.all()
     serializer_class = IngredientSerializer
+    permission_classes = (IsAuthenticatedOrReadOnly,)
 
 
 class RecipeModelViewSet(ModelViewSet):
     queryset = Recipe.objects.all()
     serializer_class = RecipeSerializer
-    pagination_class = RecipePagination
 
-    @action(detail=False, methods=['GET'])
+    pagination_class = RecipeUserPagination
+
+    permission_classes = (IsAuthenticatedOrReadOnly,)
+
+    filter_backends = (DjangoFilterBackend,)
+    filterset_fields = ['tags__name']
+
+    def common_post_method(self, model, recipe_id):
+        recipe = get_object_or_404(Recipe, pk=recipe_id)
+        user = self.request.user
+        model.objects.create(user=user, recipe=recipe)
+        serializer = RecipeDetailSerializer(recipe)
+        return Response(serializer.data, status=HTTP_201_CREATED)
+
+    @action(
+        detail=False,
+        methods=['GET'],
+        permission_classes=(IsAuthenticated,)
+    )
     def download_shopping_cart(self, request):
         user = request.user
         items = RecipeIngredient.objects.filter(
@@ -93,38 +109,41 @@ class RecipeModelViewSet(ModelViewSet):
         ).annotate(
             total_amount=Sum('amount')
         ).order_by()
-        print(items)
+        shopping_list = ''
+        for item in items:
+            shopping_list += (f'{item["ingredients__name"]} '
+                              f'({item["ingredients__measurement_unit"]}) - '
+                              f'{item["total_amount"]} \n')
 
-        return Response({'sorry, not yet implemented': 1}, status=HTTP_200_OK)
+        response = HttpResponse(content=shopping_list, content_type='text/plain')
+        response['Content-Disposition'] = ('attachment; '
+                                           'filename=shopping_cart.txt')
+        return response
 
-    @action(detail=True, methods=['POST'])
+    @action(
+        detail=True,
+        methods=['POST'],
+        permission_classes=(IsAuthenticated,)
+    )
     def shopping_cart(self, request, pk):
-        recipe = get_object_or_404(Recipe, pk=pk)
-        user = request.user
-        Cart.objects.create(user=user, recipe=recipe)
-        serializer = RecipeDetailSerializer(recipe)
-        return Response(serializer.data, status=HTTP_201_CREATED)
+        return self.common_post_method(model=Cart, recipe_id=pk)
 
     @shopping_cart.mapping.delete
     def delete_shopping_cart(self, *args, **kwargs):
         recipe = get_object_or_404(Recipe, pk=kwargs['pk'])
-        user = self.request.user
-        recipe.cart_recipe.filter(user=user).delete()
+        recipe.cart_recipe.filter(user=self.request.user).delete()
         return Response(status=HTTP_204_NO_CONTENT)
 
-    @action(detail=True, methods=['POST'])
+    @action(
+        detail=True,
+        methods=['POST'],
+        permission_classes=(IsAuthenticated,)
+    )
     def favorite(self, request, pk):
-        recipe = get_object_or_404(Recipe, pk=pk)
-        user = request.user
-        Favorite.objects.create(user=user, recipe=recipe)
-        serializer = RecipeDetailSerializer(recipe)
-        return Response(serializer.data, status=HTTP_201_CREATED)
+        return self.common_post_method(model=Favorite, recipe_id=pk)
 
     @favorite.mapping.delete
     def delete_favorite(self, *args, **kwargs):
         recipe = get_object_or_404(Recipe, pk=kwargs['pk'])
-        user = self.request.user
-        recipe.fav_recipe.filter(user=user).delete()
+        recipe.fav_recipe.filter(user=self.request.user).delete()
         return Response(status=HTTP_204_NO_CONTENT)
-
-# TODO Посмотреть про Inline, сделать общий метод, mapping, файлы в тг

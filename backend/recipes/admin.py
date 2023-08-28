@@ -1,4 +1,4 @@
-from django.contrib.admin import ModelAdmin, register
+from django.contrib.admin import ModelAdmin, register, TabularInline
 
 from .models import Cart, Favorite, Ingredient, Recipe, Tag, RecipeIngredient
 
@@ -8,8 +8,14 @@ class TagAdmin(ModelAdmin):
     list_display = ('name', 'color', 'slug')
 
 
+class RecipeIngredientInline(TabularInline):
+    model = RecipeIngredient
+    list_display = ('recipe', 'ingredients')
+
+
 @register(Recipe)
 class RecipeAdmin(ModelAdmin):
+    inlines = [RecipeIngredientInline]
     list_display = ('name', 'author', 'in_favorites')
     search_filter = ('author', 'name', 'tags')
 
@@ -36,3 +42,4 @@ class FavoriteAdmin(ModelAdmin):
 @register(RecipeIngredient)
 class RecipeIngredientAdmin(ModelAdmin):
     list_display = ('recipe', 'ingredients')
+

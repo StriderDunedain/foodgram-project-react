@@ -25,7 +25,7 @@ class UserSerializer(DjoserUserSerializer):
 
     def get_is_subscribed(self, user):
         return (user.is_authenticated
-                and user.author.filter(subscriber=user).exists())
+                and user.subscriptions.filter(subscriber=user).exists())
 
 
 class UserCreateSerializer(DjoserUserCreateSerializer):

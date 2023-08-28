@@ -33,7 +33,6 @@ services:
     image: nginx:1.19.3
     ports:
       - 80:80
-
     volumes:
       - ../frontend/build:/usr/share/nginx/html/
 

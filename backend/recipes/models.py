@@ -16,7 +16,12 @@ class Tag(Model):
     slug = SlugField(unique=True)
 
     class Meta:
+        verbose_name = 'Тэг'
+        verbose_name_plural = 'Тэги'
         ordering = ('name',)
+
+    def __str__(self):
+        return self.name
 
 
 class Ingredient(Model):
@@ -24,7 +29,12 @@ class Ingredient(Model):
     measurement_unit = CharField(max_length=25)
 
     class Meta:
+        verbose_name = 'Ингредиент'
+        verbose_name_plural = 'Ингредиенты'
         ordering = ('name',)
+
+    def __str__(self):
+        return self.name
 
 
 class Recipe(Model):
@@ -54,7 +64,12 @@ class Recipe(Model):
     )
 
     class Meta:
+        verbose_name = 'Рецепт'
+        verbose_name_plural = 'Рецепты'
         ordering = ('name',)
+
+    def __str__(self):
+        return self.name
 
 
 class RecipeIngredient(Model):
@@ -78,6 +93,8 @@ class RecipeIngredient(Model):
     )
 
     class Meta:
+        verbose_name = 'Рецепто-Ингредиенто'
+        verbose_name_plural = 'Рецепто-Ингредиенто'
         constraints = (
             UniqueConstraint(
                 fields=(
@@ -102,6 +119,8 @@ class Cart(Model):
     )
 
     class Meta:
+        verbose_name = 'В корзине'
+        verbose_name_plural = 'В корзине'
         constraints = (
             UniqueConstraint(
                 fields=(
@@ -127,6 +146,8 @@ class Favorite(Model):
     )
 
     class Meta:
+        verbose_name = 'В избранном'
+        verbose_name_plural = 'В избранном'
         constraints = (
             UniqueConstraint(
                 fields=(
