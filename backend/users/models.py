@@ -1,8 +1,7 @@
+from core import constants as const
 from django.contrib.auth.models import AbstractUser
 from django.db.models import (CASCADE, CharField, CheckConstraint, EmailField,
                               F, ForeignKey, Model, Q, UniqueConstraint)
-
-from core import constants as const
 
 
 class User(AbstractUser):

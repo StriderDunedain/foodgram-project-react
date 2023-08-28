@@ -1,21 +1,21 @@
 from django.db.models import Sum
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404
-from rest_framework.mixins import Response
-from rest_framework.permissions import IsAuthenticated, IsAuthenticatedOrReadOnly
-from rest_framework.viewsets import ModelViewSet, ReadOnlyModelViewSet
-from rest_framework.decorators import action
-from rest_framework.status import HTTP_201_CREATED, HTTP_204_NO_CONTENT
 from django_filters.rest_framework import DjangoFilterBackend
-
-from recipes.models import Ingredient, Recipe, Tag, Favorite, Cart, RecipeIngredient
-from users.models import User, Subscription
+from recipes.models import (Cart, Favorite, Ingredient, Recipe,
+                            RecipeIngredient, Tag)
+from rest_framework.decorators import action
+from rest_framework.mixins import Response
+from rest_framework.permissions import (IsAuthenticated,
+                                        IsAuthenticatedOrReadOnly)
+from rest_framework.status import HTTP_201_CREATED, HTTP_204_NO_CONTENT
+from rest_framework.viewsets import ModelViewSet, ReadOnlyModelViewSet
+from users.models import Subscription, User
 
 from .pagination import RecipeUserPagination
-from .serializers import (IngredientSerializer, TagSerializer,
-                          UserCreateSerializer, UserSerializer,
+from .serializers import (IngredientSerializer, RecipeDetailSerializer,
                           RecipeSerializer, SubscriptionSerializer,
-                          RecipeDetailSerializer)
+                          TagSerializer, UserCreateSerializer, UserSerializer)
 
 
 class UserModelViewSet(ModelViewSet):
