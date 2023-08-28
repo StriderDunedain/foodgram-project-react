@@ -42,4 +42,3 @@ class FavoriteAdmin(ModelAdmin):
 @register(RecipeIngredient)
 class RecipeIngredientAdmin(ModelAdmin):
     list_display = ('recipe', 'ingredients')
-
