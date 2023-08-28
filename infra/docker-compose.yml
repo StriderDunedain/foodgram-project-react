@@ -3,8 +3,8 @@ version: '3.3'
 services:
 
   frontend:
-    container_name: frontend
-    build: ../frontend
+    container_name: frontend_img
+    image: rostiislav/foodgram_frontend:latest
     volumes:
       - ../frontend/:/app/result_build/
 
@@ -12,7 +12,7 @@ services:
     container_name: database
     image: postgres:13.0-alpine
     volumes:
-      - postgres_db:/app/var/lib/postgresql/data/
+      - postgres_db:/var/lib/postgresql/data/
     env_file:
       - ./.env
 
@@ -21,13 +21,14 @@ services:
     build: ../backend
     restart: always
     volumes:
-      - static_dir:/app/static/
-      - media_dir:/app/media/
+      - static_dir:/code/static/
+      - media_dir:/code/media/
     depends_on:
       - db
     env_file:
       - ./.env
-
+    ports:
+      - "8000:8000"
   nginx:
     container_name: nginx
     image: nginx:1.19.3
@@ -38,9 +39,9 @@ services:
 
       - ./nginx.conf:/etc/nginx/conf.d/default.conf
 
-      - static_dir:/var/html/static/
+      - static_dir:/code/static/
 
-      - media_dir:/var/html/media/
+      - media_dir:/code/media/
 
     depends_on:
       - backend

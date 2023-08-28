@@ -6,7 +6,7 @@ from core import constants as const
 
 
 class User(AbstractUser):
-    REQUIRED_FIELDS = ('first_name', 'last_name', 'password')
+    REQUIRED_FIELDS = ('first_name', 'last_name', 'password', 'username')
     USERNAME_FIELD = 'email'
 
     username = CharField(
