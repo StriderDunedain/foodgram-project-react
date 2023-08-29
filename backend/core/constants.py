@@ -1,4 +1,4 @@
-'''File For Some Limiting Constant Values'''
+"""File For Some Limiting Constant Values."""
 
 # Constants for `users` app
 EMAIL_LIMIT = 45
@@ -19,3 +19,5 @@ RECIPE_DESCRIPTION_LIMIT = 250
 
 # Constants for the API
 OBJECTS_PER_PAGE = 6
+
+DEFAULT_OBJECTS_IN_API = 3

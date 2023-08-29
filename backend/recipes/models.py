@@ -1,10 +1,11 @@
-from core import constants as const
 from django.contrib.auth import get_user_model
 from django.core.validators import MinValueValidator
 from django.db.models import (CASCADE, CharField, ForeignKey, ImageField,
                               ManyToManyField, Model,
                               PositiveSmallIntegerField, SlugField, TextField,
                               UniqueConstraint)
+
+from core import constants as const
 
 User = get_user_model()
 
@@ -57,7 +58,7 @@ class Recipe(Model):
     cooking_time = PositiveSmallIntegerField(
         validators=(
             MinValueValidator(
-                0, 'Что-то маловато выходит...'
+                1, 'Что-то маловато выходит...'
             ),
         )
     )
@@ -86,7 +87,7 @@ class RecipeIngredient(Model):
         default=1,
         validators=(
             MinValueValidator(
-                0, 'Слишком мало...'
+                1, 'Слишком мало...'
             ),
         )
     )

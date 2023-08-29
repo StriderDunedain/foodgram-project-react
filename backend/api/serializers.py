@@ -1,9 +1,13 @@
-from djoser.serializers import \
+from djoser.serializers import (
     UserCreateSerializer as DjoserUserCreateSerializer
+)
 from djoser.serializers import UserSerializer as DjoserUserSerializer
 from recipes.models import Ingredient, Recipe, RecipeIngredient, Tag
-from rest_framework.serializers import (CharField, ModelSerializer,
-                                        SerializerMethodField)
+from rest_framework.serializers import (
+    CharField, IntegerField, ModelSerializer, SerializerMethodField
+)
+
+from core.constants import OBJECTS_PER_PAGE
 from users.models import User
 
 
@@ -51,7 +55,7 @@ class RecipeDetailSerializer(ModelSerializer):
 
 class SubscriptionSerializer(ModelSerializer):
     recipes = SerializerMethodField()
-    recipes_count = SerializerMethodField()
+    recipes_count = IntegerField(source='recipe_author.count')
 
     class Meta:
         model = User
@@ -65,13 +69,12 @@ class SubscriptionSerializer(ModelSerializer):
         )
 
     def get_recipes(self, user):
-        recipes_limit = self.context['request'].GET.get('recipes_limit', 3)
+        recipes_limit = self.context['request'].GET.get(
+            'recipes_limit', OBJECTS_PER_PAGE
+        )
         recipes = user.recipe_author.all()[:int(recipes_limit)]
         serializer = RecipeDetailSerializer(recipes, many=True)
         return serializer.data
-
-    def get_recipes_count(self, user):
-        return user.recipe_author.count()
 
 
 class TagSerializer(ModelSerializer):

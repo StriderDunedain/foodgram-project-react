@@ -4,7 +4,9 @@ services:
 
   frontend:
     container_name: frontend_img
-    image: rostiislav/foodgram_frontend:latest
+    build:
+      context: ../frontend
+      dockerfile: Dockerfile
     volumes:
       - ../frontend/:/app/result_build/
 

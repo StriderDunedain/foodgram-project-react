@@ -1,5 +1,6 @@
 from django.contrib.admin import ModelAdmin, TabularInline, register
 
+from .forms import RequiredInlineFormSet
 from .models import Cart, Favorite, Ingredient, Recipe, RecipeIngredient, Tag
 
 
@@ -10,6 +11,7 @@ class TagAdmin(ModelAdmin):
 
 class RecipeIngredientInline(TabularInline):
     model = RecipeIngredient
+    formset = RequiredInlineFormSet
     list_display = ('recipe', 'ingredients')
 
 
