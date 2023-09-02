@@ -1,13 +1,17 @@
+from django.db.transaction import atomic
+from django.shortcuts import get_object_or_404
+from drf_extra_fields.fields import Base64ImageField
 from djoser.serializers import (
     UserCreateSerializer as DjoserUserCreateSerializer
 )
 from djoser.serializers import UserSerializer as DjoserUserSerializer
-from recipes.models import Ingredient, Recipe, RecipeIngredient, Tag
 from rest_framework.serializers import (
-    CharField, IntegerField, ModelSerializer, SerializerMethodField
+    CharField, IntegerField, ModelSerializer, SerializerMethodField,
+    ValidationError, PrimaryKeyRelatedField
 )
 
 from core.constants import OBJECTS_PER_PAGE
+from recipes.models import Ingredient, Recipe, RecipeIngredient, Tag
 from users.models import User
 
 
@@ -60,6 +64,7 @@ class SubscriptionSerializer(ModelSerializer):
     class Meta:
         model = User
         fields = (
+            'id',
             'email',
             'username',
             'first_name',
@@ -89,7 +94,6 @@ class TagSerializer(ModelSerializer):
 
 
 class IngredientSerializer(ModelSerializer):
-
     class Meta:
         model = Ingredient
         fields = (
@@ -101,8 +105,11 @@ class IngredientSerializer(ModelSerializer):
 
 class RecipeIngredientSerializer(ModelSerializer):
     id = CharField(source='ingredients.id')
-    name = CharField(source='ingredients.name')
-    measurement_unit = CharField(source='ingredients.measurement_unit')
+    name = CharField(source='ingredients.name', read_only=True)
+    measurement_unit = CharField(
+        source='ingredients.measurement_unit',
+        read_only=True
+    )
 
     class Meta:
         model = RecipeIngredient
@@ -116,10 +123,14 @@ class RecipeIngredientSerializer(ModelSerializer):
 
 class RecipeSerializer(ModelSerializer):
     tags = TagSerializer(many=True)
-    author = UserSerializer()
-    ingredients = RecipeIngredientSerializer(many=True, source='recipe')
-    is_favorited = SerializerMethodField()
-    is_in_shopping_cart = SerializerMethodField()
+    author = UserSerializer(read_only=True)
+    ingredients = RecipeIngredientSerializer(
+        many=True,
+        source='ingredients_recipe'
+    )
+    is_favorited = SerializerMethodField(read_only=True)
+    is_in_shopping_cart = SerializerMethodField(read_only=True)
+    image = Base64ImageField()
 
     class Meta:
         model = Recipe
@@ -145,3 +156,63 @@ class RecipeSerializer(ModelSerializer):
         user = self.context['request'].user
         return (user.is_authenticated
                 and recipe.cart_recipe.filter(user=user).exists())
+
+
+class RecipeCreateSerializer(RecipeSerializer):
+    tags = PrimaryKeyRelatedField(
+        queryset=Tag.objects.all(),
+        write_only=True,
+        many=True
+    )
+
+    def validate(self, data):
+        ingredients = []
+
+        for ingredient in data['ingredients_recipe']:
+            ingredient_id = ingredient.get('ingredients', {}).get('id')
+            ingredients.append(ingredient_id)
+
+        if len(set(ingredients)) != len(ingredients):
+            raise ValidationError('Ингредиенты повторяются')
+
+        if not data.get('tags', []):
+            raise ValidationError('Нет тегов')
+        if not data.get('ingredients_recipe', []):
+            raise ValidationError('Нет ингредиентов')
+
+        if data.get('cooking_time') <= 0:
+            raise ValidationError('Время готовки меньше / равно 0')
+
+        for ingredient in data['ingredients_recipe']:
+            if ingredient['amount'] <= 0:
+                raise ValidationError(
+                    f'Вес ингредиента {ingredient} меньше 0'
+                )
+        return data
+
+    @atomic()
+    def create(self, validated_data):
+        tags = validated_data.pop('tags')
+        ingredients = validated_data.pop('ingredients_recipe')
+        recipe = Recipe.objects.create(**validated_data)
+        recipe.tags.set(tags)
+        for ingredient in ingredients:
+            RecipeIngredient.objects.create(
+                ingredients_id=ingredient['ingredients']['id'],
+                recipe=recipe,
+            )
+        return recipe
+
+    @atomic()
+    def update(self, recipe, validated_data):
+        tags = validated_data.pop('tags')
+        ingredients = validated_data.pop('ingredients_recipe')
+        super().update(recipe, validated_data)
+        recipe.tags.set(tags)
+        recipe.ingredients_recipe.all().delete()
+        for ingredient in ingredients:
+            RecipeIngredient.objects.create(
+                ingredients_id=ingredient['ingredients']['id'],
+                recipe=recipe,
+            )
+        return recipe

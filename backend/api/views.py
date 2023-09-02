@@ -9,14 +9,18 @@ from rest_framework.viewsets import ModelViewSet, ReadOnlyModelViewSet
 
 from core.utils import shopping_cart_util
 from recipes.models import (Cart, Favorite, Ingredient, Recipe, Tag)
+from .filters import RecipeFilter, IngredientFilter
 from .pagination import RecipeUserPagination
 from .serializers import (IngredientSerializer, RecipeDetailSerializer,
-                          RecipeSerializer, SubscriptionSerializer,
+                          RecipeSerializer, RecipeCreateSerializer,
+                          SubscriptionSerializer,
                           TagSerializer, UserCreateSerializer, UserSerializer)
 from users.models import Subscription, User
 
+from djoser.views import UserViewSet as DjoserUserViewSet
 
-class UserModelViewSet(ModelViewSet):
+
+class UserViewSet(DjoserUserViewSet):
     queryset = User.objects.all()
     serializer_class = UserSerializer
     pagination_class = RecipeUserPagination
@@ -48,7 +52,7 @@ class UserModelViewSet(ModelViewSet):
         permission_classes=(IsAuthenticated,)
     )
     def subscribe(self, *args, **kwargs):
-        author = get_object_or_404(User, pk=kwargs['pk'])
+        author = get_object_or_404(User, pk=kwargs['id'])
         user = self.request.user
         Subscription.objects.create(author=author, subscriber=user)
         serializer = SubscriptionSerializer(author)
@@ -56,32 +60,43 @@ class UserModelViewSet(ModelViewSet):
 
     @subscribe.mapping.delete
     def delete_subscribe(self, *args, **kwargs):
-        author = get_object_or_404(User, pk=kwargs['pk'])
+        author = get_object_or_404(User, pk=kwargs['id'])
         user = self.request.user
         author.subscriptions.filter(subscriber=user).delete()
         return Response(status=HTTP_204_NO_CONTENT)
 
 
-class TagModelViewSet(ReadOnlyModelViewSet):
+class TagViewSet(ReadOnlyModelViewSet):
     queryset = Tag.objects.all()
     serializer_class = TagSerializer
     permission_classes = (IsAuthenticatedOrReadOnly,)
 
 
-class IngredientModelViewSet(ReadOnlyModelViewSet):
+class IngredientViewSet(ReadOnlyModelViewSet):
     queryset = Ingredient.objects.all()
     serializer_class = IngredientSerializer
     permission_classes = (IsAuthenticatedOrReadOnly,)
 
+    filter_backends = (IngredientFilter,)
+    search_fields = ('^name',)
 
-class RecipeModelViewSet(ModelViewSet):
+
+class RecipeViewSet(ModelViewSet):
     queryset = Recipe.objects.all()
     serializer_class = RecipeSerializer
     pagination_class = RecipeUserPagination
     permission_classes = (IsAuthenticatedOrReadOnly,)
 
     filter_backends = (DjangoFilterBackend,)
-    filterset_fields = ['tags__name']
+    filterset_class = RecipeFilter
+
+    def get_serializer_class(self):
+        if self.request.method == 'GET':
+            return super().get_serializer_class()
+        return RecipeCreateSerializer
+
+    def perform_create(self, serializer):
+        serializer.save(author=self.request.user)
 
     def common_post_method(self, model, recipe_id):
         recipe = get_object_or_404(Recipe, pk=recipe_id)

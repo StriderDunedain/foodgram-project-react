@@ -3,10 +3,10 @@ version: '3.3'
 services:
 
   frontend:
-    container_name: frontend_img
+    container_name: frontend
     build:
       context: ../frontend
-      dockerfile: Dockerfile
+      dockerfile: ../frontend/Dockerfile
     volumes:
       - ../frontend/:/app/result_build/
 
@@ -23,6 +23,7 @@ services:
     build: ../backend
     restart: always
     volumes:
+      - ../backend:/code
       - static_dir:/code/static/
       - media_dir:/code/media/
     depends_on:

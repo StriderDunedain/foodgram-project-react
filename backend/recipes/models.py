@@ -75,7 +75,7 @@ class Recipe(Model):
 class RecipeIngredient(Model):
     recipe = ForeignKey(
         Recipe,
-        related_name='recipe',
+        related_name='ingredients_recipe',
         on_delete=CASCADE
     )
     ingredients = ForeignKey(
@@ -95,15 +95,6 @@ class RecipeIngredient(Model):
     class Meta:
         verbose_name = 'Рецепто-Ингредиенто'
         verbose_name_plural = 'Рецепто-Ингредиенто'
-        constraints = (
-            UniqueConstraint(
-                fields=(
-                    'recipe',
-                    'ingredients'
-                ),
-                name='recipe_ingredients_constraint'
-            ),
-        )
 
 
 class Cart(Model):
