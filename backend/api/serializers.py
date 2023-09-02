@@ -1,5 +1,4 @@
 from django.db.transaction import atomic
-from django.shortcuts import get_object_or_404
 from drf_extra_fields.fields import Base64ImageField
 from djoser.serializers import (
     UserCreateSerializer as DjoserUserCreateSerializer

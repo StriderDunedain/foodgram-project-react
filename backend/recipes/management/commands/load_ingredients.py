@@ -13,7 +13,9 @@ class Command(BaseCommand):
         print('Загрузка ингредиентов началась...')
         for ingredient in ingredients_data:
             try:
-                if not Ingredient.objects.filter(name=ingredient['name']).exists():
+                if not Ingredient.objects.filter(
+                        name=ingredient['name']
+                ).exists():
                     Ingredient.objects.create(**ingredient)
                 else:
                     print(f'Ингредиент {ingredient["name"]} уже есть в базе')
