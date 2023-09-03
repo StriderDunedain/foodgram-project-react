@@ -1,13 +1,12 @@
 from django.db.transaction import atomic
-from drf_extra_fields.fields import Base64ImageField
-from djoser.serializers import (
+from djoser.serializers import \
     UserCreateSerializer as DjoserUserCreateSerializer
-)
 from djoser.serializers import UserSerializer as DjoserUserSerializer
-from rest_framework.serializers import (
-    CharField, IntegerField, ModelSerializer, SerializerMethodField,
-    ValidationError, PrimaryKeyRelatedField
-)
+from drf_extra_fields.fields import Base64ImageField
+from rest_framework.serializers import (CharField, IntegerField,
+                                        ModelSerializer,
+                                        PrimaryKeyRelatedField,
+                                        SerializerMethodField, ValidationError)
 
 from core.constants import OBJECTS_PER_PAGE
 from recipes.models import Ingredient, Recipe, RecipeIngredient, Tag
@@ -189,29 +188,34 @@ class RecipeCreateSerializer(RecipeSerializer):
                 )
         return data
 
-    @atomic()
-    def create(self, validated_data):
+    def common_create_update_method(self, validated_data, recipe=None):
         tags = validated_data.pop('tags')
         ingredients = validated_data.pop('ingredients_recipe')
-        recipe = Recipe.objects.create(**validated_data)
+        if recipe is None:
+            recipe = Recipe.objects.create(**validated_data)
+        else:
+            super().update(recipe, validated_data)
+            recipe.ingredients_recipe.all().delete()
         recipe.tags.set(tags)
-        for ingredient in ingredients:
-            RecipeIngredient.objects.create(
-                ingredients_id=ingredient['ingredients']['id'],
-                recipe=recipe,
-            )
+        RecipeIngredient.objects.bulk_create(
+            [
+                RecipeIngredient(
+                    ingredients_id=ingredient['ingredients']['id'],
+                    recipe=recipe
+                ) for ingredient in ingredients
+            ]
+        )
         return recipe
 
     @atomic()
+    def create(self, validated_data):
+        return self.common_create_update_method(
+            validated_data=validated_data
+        )
+
+    @atomic()
     def update(self, recipe, validated_data):
-        tags = validated_data.pop('tags')
-        ingredients = validated_data.pop('ingredients_recipe')
-        super().update(recipe, validated_data)
-        recipe.tags.set(tags)
-        recipe.ingredients_recipe.all().delete()
-        for ingredient in ingredients:
-            RecipeIngredient.objects.create(
-                ingredients_id=ingredient['ingredients']['id'],
-                recipe=recipe,
-            )
-        return recipe
+        return self.common_create_update_method(
+            validated_data=validated_data,
+            recipe=recipe
+        )

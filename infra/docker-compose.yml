@@ -4,9 +4,7 @@ services:
 
   frontend:
     container_name: frontend
-    build:
-      context: ../frontend
-      dockerfile: ../frontend/Dockerfile
+    image: maxthecoder/foodgram-frontend:latest
     volumes:
       - ../frontend/:/app/result_build/
 
@@ -20,7 +18,7 @@ services:
 
   backend:
     container_name: backend
-    build: ../backend
+    image: maxthecoder/foodgram-backend:latest
     restart: always
     volumes:
       - ../backend:/code

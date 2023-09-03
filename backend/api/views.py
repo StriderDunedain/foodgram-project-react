@@ -1,5 +1,6 @@
 from django.shortcuts import get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
+from djoser.views import UserViewSet as DjoserUserViewSet
 from rest_framework.decorators import action
 from rest_framework.mixins import Response
 from rest_framework.permissions import (IsAuthenticated,
@@ -8,16 +9,14 @@ from rest_framework.status import HTTP_201_CREATED, HTTP_204_NO_CONTENT
 from rest_framework.viewsets import ModelViewSet, ReadOnlyModelViewSet
 
 from core.utils import shopping_cart_util
-from recipes.models import (Cart, Favorite, Ingredient, Recipe, Tag)
-from .filters import RecipeFilter, IngredientFilter
-from .pagination import RecipeUserPagination
-from .serializers import (IngredientSerializer, RecipeDetailSerializer,
-                          RecipeSerializer, RecipeCreateSerializer,
-                          SubscriptionSerializer,
-                          TagSerializer, UserCreateSerializer, UserSerializer)
+from recipes.models import Cart, Favorite, Ingredient, Recipe, Tag
 from users.models import Subscription, User
-
-from djoser.views import UserViewSet as DjoserUserViewSet
+from .filters import IngredientFilter, RecipeFilter
+from .pagination import RecipeUserPagination
+from .serializers import (IngredientSerializer, RecipeCreateSerializer,
+                          RecipeDetailSerializer, RecipeSerializer,
+                          SubscriptionSerializer, TagSerializer,
+                          UserCreateSerializer, UserSerializer)
 
 
 class UserViewSet(DjoserUserViewSet):
