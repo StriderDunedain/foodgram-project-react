@@ -21,7 +21,6 @@ services:
     image: maxthecoder/foodgram-backend:latest
     restart: always
     volumes:
-      - ../backend:/code
       - static_dir:/code/static/
       - media_dir:/code/media/
     depends_on:
