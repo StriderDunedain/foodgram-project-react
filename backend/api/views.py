@@ -64,6 +64,13 @@ class UserViewSet(DjoserUserViewSet):
         author.subscriptions.filter(subscriber=user).delete()
         return Response(status=HTTP_204_NO_CONTENT)
 
+    def reset_password(self, request, *args, **kwargs):
+        return super().reset_password(
+            request=request,
+            args=args,
+            kwargs=kwargs
+        )
+
 
 class TagViewSet(ReadOnlyModelViewSet):
     queryset = Tag.objects.all()

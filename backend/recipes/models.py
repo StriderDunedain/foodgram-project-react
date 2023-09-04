@@ -84,6 +84,7 @@ class RecipeIngredient(Model):
         on_delete=CASCADE
     )
     amount = PositiveSmallIntegerField(
+        default=1,
         validators=(
             MinValueValidator(
                 1, 'Слишком мало...'

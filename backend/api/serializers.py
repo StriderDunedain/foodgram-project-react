@@ -192,8 +192,10 @@ class RecipeCreateSerializer(RecipeSerializer):
         tags = validated_data.pop('tags')
         ingredients = validated_data.pop('ingredients_recipe')
         if recipe is None:
+            # create logic
             recipe = Recipe.objects.create(**validated_data)
         else:
+            # update logic
             super().update(recipe, validated_data)
             recipe.ingredients_recipe.all().delete()
         recipe.tags.set(tags)
@@ -201,6 +203,7 @@ class RecipeCreateSerializer(RecipeSerializer):
             [
                 RecipeIngredient(
                     ingredients_id=ingredient['ingredients']['id'],
+                    amount=ingredient['amount'],
                     recipe=recipe
                 ) for ingredient in ingredients
             ]
