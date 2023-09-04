@@ -8,5 +8,5 @@ RUN pip install -r requirements.txt
 
 COPY . .
 
-#CMD ["gunicorn", "backend.foodgram.wsgi:application", "--bind", "158.160.23.197:8000" ]
+#CMD ["gunicorn", "foodgram.wsgi:application", "--bind", "158.160.23.197:8000"]
 CMD ["python", "manage.py", "runserver", "158.160.23.197:8000"]
