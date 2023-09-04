@@ -18,10 +18,7 @@ services:
 
   backend:
     container_name: backend
-#    image: maxthecoder/foodgram-backend:latest
-    build:
-      context: ../backend
-      dockerfile: ../backend/Dockerfile
+    image: maxthecoder/foodgram-backend:python_build
     restart: always
     volumes:
       - ../backend:/code
