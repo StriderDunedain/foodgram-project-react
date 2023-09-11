@@ -1,5 +1,5 @@
 # Проект Foodgram
-![example workflow](https://github.com/StriderDunedain/foodgram-project-react/actions/workflows/main.yml/badge.svg)  
+![Foodgram Workflow](https://github.com/StriderDunedain/foodgram-project-react/actions/workflows/main.yml/badge.svg)  
   
 [![Python](https://img.shields.io/badge/-Python-464646?style=flat-square&logo=Python)](https://www.python.org/)
 [![Django](https://img.shields.io/badge/-Django-464646?style=flat-square&logo=Django)](https://www.djangoproject.com/)
@@ -8,43 +8,35 @@
 [![Nginx](https://img.shields.io/badge/-NGINX-464646?style=flat-square&logo=NGINX)](https://nginx.org/ru/)
 [![gunicorn](https://img.shields.io/badge/-gunicorn-464646?style=flat-square&logo=gunicorn)](https://gunicorn.org/)
 [![docker](https://img.shields.io/badge/-Docker-464646?style=flat-square&logo=docker)](https://www.docker.com/)
-[![GitHub%20Actions](https://img.shields.io/badge/-GitHub%20Actions-464646?style=flat-square&logo=GitHub%20actions)](https://github.com/features/actions)
 [![Yandex.Cloud](https://img.shields.io/badge/-Yandex.Cloud-464646?style=flat-square&logo=Yandex.Cloud)](https://cloud.yandex.ru/)
 
 
 
-Foodgram реализован для публикации рецептов. Авторизованные пользователи
-могут подписываться на понравившихся авторов, добавлять рецепты в избранное,
-в покупки, скачать список покупок ингредиентов для добавленных в покупки
-рецептов.
+Foodgram - тип как инстаграм, только для продуктов
 
-## Подготовка и запуск проекта
-### Склонировать репозиторий на локальную машину:
+# Как запустить?
+## Склонируйте репо:
 ```
 git clone https://github.com/StriderDunedain/foodgram-project-react
 ```
-## Для работы с удаленным сервером (на ubuntu):
-* Выполните вход на свой удаленный сервер
-
-* Установите docker на сервер:
+## Магия сервера:
+- Установите Docker на сервер:
 ```
 sudo apt install docker.io 
 ```
-* Установите docker-compose на сервер:
+- Установите Docker Compose на сервер:
 ```
 sudo curl -L "https://github.com/docker/compose/releases/download/1.29.2/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
-sudo chmod +x /usr/local/bin/docker-compose
 ```
-* Локально отредактируйте файл infra/nginx.conf и в строке server_name впишите свой IP
-* Скопируйте файлы docker-compose.yml и nginx.conf из директории infra на сервер:
+- Скопируйте docker-compose.yml и nginx.conf
+- В infra/nginx.conf в строке server_name впишите свой IP
 ```
 scp docker-compose.yml <username>@<host>:/home/<username>/docker-compose.yml
 scp nginx.conf <username>@<host>:/home/<username>/nginx.conf
 ```
 
-* Cоздайте .env файл и впишите:
+- Cоздайте .env файл и впишите:
     ```
-    DB_ENGINE=<django.db.backends.postgresql>
     DB_NAME=<имя базы данных postgres>
     DB_USER=<пользователь бд>
     DB_PASSWORD=<пароль>
@@ -52,9 +44,8 @@ scp nginx.conf <username>@<host>:/home/<username>/nginx.conf
     DB_PORT=<5432>
     SECRET_KEY=<секретный ключ проекта django>
     ```
-* Для работы с Workflow добавьте в Secrets GitHub переменные окружения для работы:
+- Для работы с Workflow добавьте в Secrets GitHub переменные окружения для работы:
     ```
-    DB_ENGINE=<django.db.backends.postgresql>
     DB_NAME=<имя базы данных postgres>
     DB_USER=<пользователь бд>
     DB_PASSWORD=<пароль>
@@ -74,17 +65,11 @@ scp nginx.conf <username>@<host>:/home/<username>/nginx.conf
     TELEGRAM_TO=<ID чата, в который придет сообщение>
     TELEGRAM_TOKEN=<токен вашего бота>
     ```
-    Workflow состоит из трёх шагов:
-     - Проверка кода на соответствие PEP8
-     - Сборка и публикация образа бекенда на DockerHub.
-     - Автоматический деплой на удаленный сервер.
-     - Отправка уведомления в телеграм-чат.  
-  
-* На сервере соберите docker-compose:
+- Сделайте как завещал docker-compose:
 ```
 sudo docker-compose up -d --build
 ```
-* После успешной сборки на сервере выполните команды (только после первого деплоя):
+- После успешной сборки выполните команды:
     - Соберите статические файлы:
     ```
     sudo docker-compose exec backend python manage.py collectstatic --noinput
@@ -93,8 +78,7 @@ sudo docker-compose up -d --build
     ```
     sudo docker-compose exec backend python manage.py migrate --noinput
     ```
-    - Загрузите ингридиенты  в базу данных (необязательно):  
-    *Если файл не указывать, по умолчанию выберется ingredients.json*
+    - Загрузите ингридиенты  в базу данных:  
     ```
     sudo docker-compose exec backend python manage.py load_ingredients <Название файла из директории data>
     ```
@@ -102,4 +86,5 @@ sudo docker-compose up -d --build
     ```
     sudo docker-compose exec backend python manage.py createsuperuser
     ```
-    - Проект будет доступен по вашему IP
+
+Готово, все молодцы :)
