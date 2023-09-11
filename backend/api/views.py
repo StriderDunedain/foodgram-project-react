@@ -13,10 +13,11 @@ from recipes.models import Cart, Favorite, Ingredient, Recipe, Tag
 from users.models import Subscription, User
 from .filters import IngredientFilter, RecipeFilter
 from .pagination import RecipeUserPagination
-from .serializers import (IngredientSerializer, RecipeCreateSerializer,
-                          RecipeDetailSerializer, RecipeSerializer,
-                          SubscriptionSerializer, TagSerializer,
-                          UserCreateSerializer, UserSerializer)
+from .serializers import (
+    IngredientSerializer, RecipeCreateSerializer,
+    RecipeDetailSerializer, RecipeSerializer,
+    SubscriptionSerializer, TagSerializer, UserSerializer
+)
 
 
 class UserViewSet(DjoserUserViewSet):
