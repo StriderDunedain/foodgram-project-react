@@ -24,11 +24,6 @@ class UserViewSet(DjoserUserViewSet):
     serializer_class = UserSerializer
     pagination_class = RecipeUserPagination
 
-    def get_serializer_class(self):
-        if self.request.method == 'POST':
-            return UserCreateSerializer
-        return super().get_serializer_class()
-
     @action(
         detail=False,
         methods=['GET'],
@@ -63,13 +58,6 @@ class UserViewSet(DjoserUserViewSet):
         user = self.request.user
         author.subscriptions.filter(subscriber=user).delete()
         return Response(status=HTTP_204_NO_CONTENT)
-
-    def reset_password(self, request, *args, **kwargs):
-        return super().reset_password(
-            request=request,
-            args=args,
-            kwargs=kwargs
-        )
 
 
 class TagViewSet(ReadOnlyModelViewSet):
