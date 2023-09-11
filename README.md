@@ -11,6 +11,7 @@
 [![Yandex.Cloud](https://img.shields.io/badge/-Yandex.Cloud-464646?style=flat-square&logo=Yandex.Cloud)](https://cloud.yandex.ru/)
 
 Доступно здесь - 158.160.23.197
+Логин & Пароль - max@max.ru & max
 
 Foodgram - тип как инстаграм, только для продуктов
 
