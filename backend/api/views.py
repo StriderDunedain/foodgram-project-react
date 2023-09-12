@@ -56,7 +56,7 @@ class UserViewSet(DjoserUserViewSet):
             return Response(serializer.data, status=HTTP_201_CREATED)
         except IntegrityError as e:
             return Response(
-                data={'exists': 'exists'},
+                data={'exists': e},
                 status=HTTP_204_NO_CONTENT
             )
 
