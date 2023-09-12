@@ -72,9 +72,13 @@ class SubscriptionSerializer(ModelSerializer):
         )
 
     def get_recipes(self, user):
-        recipes_limit = self.context['request'].GET.get(
-            'recipes_limit', OBJECTS_PER_PAGE
-        )
+        recipes_try = self.context.get('request', None)
+        if recipes_try is None:
+            recipes_limit = OBJECTS_PER_PAGE
+        else:
+            recipes_limit = recipes_try.GET.get(
+                'recipes_limit', OBJECTS_PER_PAGE
+            )
         recipes = user.recipe_author.all()[:int(recipes_limit)]
         serializer = RecipeDetailSerializer(recipes, many=True)
         return serializer.data

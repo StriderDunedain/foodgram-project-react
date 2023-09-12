@@ -1,3 +1,4 @@
+from django.db import IntegrityError
 from django.shortcuts import get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
 from djoser.views import UserViewSet as DjoserUserViewSet
@@ -49,9 +50,15 @@ class UserViewSet(DjoserUserViewSet):
     def subscribe(self, *args, **kwargs):
         author = get_object_or_404(User, pk=kwargs['id'])
         user = self.request.user
-        Subscription.objects.create(author=author, subscriber=user)
-        serializer = SubscriptionSerializer(author)
-        return Response(serializer.data, status=HTTP_201_CREATED)
+        try:
+            Subscription.objects.create(author=author, subscriber=user)
+            serializer = SubscriptionSerializer(author)
+            return Response(serializer.data, status=HTTP_201_CREATED)
+        except IntegrityError as e:
+            return Response(
+                data={'exists': 'exists'},
+                status=HTTP_204_NO_CONTENT
+            )
 
     @subscribe.mapping.delete
     def delete_subscribe(self, *args, **kwargs):
