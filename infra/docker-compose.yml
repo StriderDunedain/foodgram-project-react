@@ -18,7 +18,7 @@ services:
 
   backend:
     container_name: backend
-    image: maxthecoder/foodgram-backend:latest
+    image: maxthecoder/foodgram-backend:final
     restart: always
     volumes:
       - static_dir:/code/static/
